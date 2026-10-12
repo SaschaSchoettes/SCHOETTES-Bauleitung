@@ -25,7 +25,7 @@ export default async function ProjektePage({
     .eq("user_id", user.id);
 
   const roleByProject = new Map<string, Role>(
-    (memberships ?? []).map((m: { project_id: string; role: Role }) => [m.project_id, m.role]),
+    (memberships ?? []).map((m: { project_id: string; role: Role }): [string, Role] => [m.project_id, m.role]),
   );
 
   const list = (projects ?? []) as Project[];
