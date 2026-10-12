@@ -1,9 +1,11 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand: #1e3a5f;
-  --color-brand-dark: #152a45;
-  --color-brand-soft: #e8eef5;
+  /* Farben aus dem Logo: Dunkelblau (Schriftzug) und Petrol (S) */
+  --color-brand: #283b5c;
+  --color-brand-dark: #1b2942;
+  --color-brand-soft: #e7eef3;
+  --color-petrol: #026c82;
   --color-accent: #e8a33d;
   --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
