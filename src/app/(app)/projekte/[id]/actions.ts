@@ -50,6 +50,11 @@ export async function updateProject(projectId: string, formData: FormData) {
       end_date: str(formData.get("end_date")),
       status: ["aktiv", "ruhend", "abgeschlossen"].includes(status) ? status : "aktiv",
       notes: str(formData.get("notes")),
+      billing_name: str(formData.get("billing_name")),
+      billing_street: str(formData.get("billing_street")),
+      billing_zip_city: str(formData.get("billing_zip_city")),
+      billing_email: str(formData.get("billing_email")),
+      billing_note: str(formData.get("billing_note")),
     })
     .eq("id", projectId);
 

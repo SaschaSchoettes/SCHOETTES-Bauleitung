@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 
-export type Tab = { href: string; label: string };
+export type Tab = { href: string; label: string; also?: string[] };
 
 export function ProjectTabs({ tabs }: { tabs: Tab[] }) {
   const pathname = usePathname();
@@ -16,9 +16,10 @@ export function ProjectTabs({ tabs }: { tabs: Tab[] }) {
   }, [pathname]);
 
   // Längster passender Pfad gewinnt (Übersicht = Basis-Pfad)
-  const active = tabs
-    .filter((t) => pathname === t.href || pathname.startsWith(t.href + "/"))
-    .sort((a, b) => b.href.length - a.href.length)[0];
+  const matches = (p: string) => pathname === p || pathname.startsWith(p + "/");
+  const active =
+    tabs.find((t) => (t.also ?? []).some(matches)) ??
+    tabs.filter((t) => matches(t.href)).sort((a, b) => b.href.length - a.href.length)[0];
 
   return (
     <nav className="no-scrollbar -mx-4 overflow-x-auto border-b border-slate-200 px-4">

@@ -11,19 +11,27 @@ export default async function ProjectLayout({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { supabase, user, project, canManage } = await requireProject(id);
+  const { supabase, user, project } = await requireProject(id);
   const base = `/projekte/${id}`;
-  const { total: unread } = await getUnread(supabase, id, user.id);
+  const [{ total: unread }, { count: openTopics }] = await Promise.all([
+    getUnread(supabase, id, user.id),
+    supabase
+      .from("topics")
+      .select("id", { count: "exact", head: true })
+      .eq("project_id", id)
+      .in("status", ["offen", "in_klaerung"]),
+  ]);
 
   const tabs: Tab[] = [
     { href: base, label: "Übersicht" },
-    { href: `${base}/bauzeitenplan`, label: "Bauzeitenplan" },
-    { href: `${base}/plaene`, label: "Pläne" },
+    { href: `${base}/themen`, label: openTopics ? `Themen (${openTopics})` : "Themen" },
     { href: `${base}/kommunikation`, label: unread > 0 ? `Kommunikation (${unread})` : "Kommunikation" },
+    { href: `${base}/bauzeitenplan`, label: "Bauzeitenplan" },
+    { href: `${base}/dokumente`, label: "Dokumente" },
     { href: `${base}/kontakte`, label: "Kontakte" },
-    { href: `${base}/stammdaten`, label: "Stammdaten" },
+    { href: `${base}/protokolle`, label: "Protokolle" },
+    { href: `${base}/stammdaten`, label: "Stammdaten", also: [`${base}/zugaenge`] },
   ];
-  if (canManage) tabs.push({ href: `${base}/zugaenge`, label: "Zugänge" });
 
   return (
     <div>

@@ -7,6 +7,7 @@ import {
   formatDate,
   todayBerlin,
   type ScheduleItem,
+  type Topic,
 } from "@/lib/types";
 
 function addDays(iso: string, n: number) {
@@ -22,8 +23,15 @@ export default async function UebersichtPage({ params }: { params: Promise<{ id:
   const today = todayBerlin();
   const in14 = addDays(today, 14);
 
-  const [{ count: contactCount }, { count: memberCount }, { count: planCount }, { data: sched }, unread] =
-    await Promise.all([
+  const [
+    { count: contactCount },
+    { count: memberCount },
+    { count: planCount },
+    { data: sched },
+    unread,
+    { data: topicData },
+    { data: lastVisit },
+  ] = await Promise.all([
       supabase.from("project_contacts").select("id", { count: "exact", head: true }).eq("project_id", id),
       supabase.from("project_members").select("user_id", { count: "exact", head: true }).eq("project_id", id),
       supabase
@@ -41,7 +49,28 @@ export default async function UebersichtPage({ params }: { params: Promise<{ id:
         .gte("end_date", today)
         .order("start_date"),
       getUnread(supabase, id, user.id),
+      supabase
+        .from("topics")
+        .select("id, title, status, due_date, decision, decided_at")
+        .eq("project_id", id)
+        .order("created_at", { ascending: false })
+        .limit(100),
+      supabase
+        .from("site_visits")
+        .select("visit_date, title")
+        .eq("project_id", id)
+        .order("visit_date", { ascending: false })
+        .limit(1),
     ]);
+
+  type TopicLite = Pick<Topic, "id" | "title" | "status" | "due_date" | "decision" | "decided_at">;
+  const topicList = (topicData ?? []) as TopicLite[];
+  const openTopics = topicList.filter((x) => x.status === "offen" || x.status === "in_klaerung");
+  const latestDecisions = topicList
+    .filter((x) => x.status === "festgelegt" && x.decided_at)
+    .sort((a, b) => (b.decided_at ?? "").localeCompare(a.decided_at ?? ""))
+    .slice(0, 3);
+  const visit = ((lastVisit ?? []) as { visit_date: string; title: string | null }[])[0];
 
   const items = (sched ?? []) as ScheduleItem[];
   const running = items.filter((i) => i.start_date <= today);
@@ -58,16 +87,22 @@ export default async function UebersichtPage({ params }: { params: Promise<{ id:
   });
 
   const tiles = [
-    { href: `${base}/bauzeitenplan`, title: "Bauzeitenplan", text: `${running.length} laufend`, icon: "▤" },
-    { href: `${base}/plaene`, title: "Pläne", text: `${planCount ?? 0} gültige Pläne`, icon: "▦" },
+    { href: `${base}/themen`, title: "Themen", text: `${openTopics.length} offen`, icon: "◎" },
     {
       href: `${base}/kommunikation`,
       title: "Kommunikation",
       text: unread.total ? `${unread.total} ungelesen` : "Keine neuen Nachrichten",
       icon: "✉",
     },
+    { href: `${base}/bauzeitenplan`, title: "Bauzeitenplan", text: `${running.length} laufend`, icon: "▤" },
+    { href: `${base}/dokumente`, title: "Dokumente", text: `${planCount ?? 0} gültige Pläne`, icon: "▦" },
     { href: `${base}/kontakte`, title: "Kontakte", text: `${contactCount ?? 0} Einträge`, icon: "☎" },
-    { href: `${base}/stammdaten`, title: "Stammdaten", text: "Projektdaten", icon: "⚙" },
+    {
+      href: `${base}/protokolle`,
+      title: "Protokolle",
+      text: visit ? `Letzter Ortstermin ${formatDate(visit.visit_date)}` : "Noch keine",
+      icon: "✎",
+    },
     ...(canManage
       ? [{ href: `${base}/zugaenge`, title: "Zugänge", text: `${memberCount ?? 0} mit Login`, icon: "🔑" }]
       : []),
@@ -134,6 +169,56 @@ export default async function UebersichtPage({ params }: { params: Promise<{ id:
           )}
         </div>
       </section>
+
+      {(openTopics.length > 0 || latestDecisions.length > 0) && (
+        <section className="grid gap-4 md:grid-cols-2">
+          <div className="card p-4">
+            <h3 className="text-xs font-semibold tracking-wide text-slate-500 uppercase">Offene Themen</h3>
+            {openTopics.length === 0 ? (
+              <p className="mt-2 text-sm text-slate-500">Keine.</p>
+            ) : (
+              <ul className="mt-2 space-y-1.5 text-sm">
+                {openTopics.slice(0, 5).map((x) => (
+                  <li key={x.id}>
+                    <Link href={`${base}/themen?offen=${x.id}#t-${x.id}`} className="hover:underline">
+                      {x.title}
+                    </Link>
+                    {x.due_date && (
+                      <span className={x.due_date < today ? "text-red-700" : "text-slate-500"}>
+                        {" "}· bis {formatDate(x.due_date)}
+                      </span>
+                    )}
+                  </li>
+                ))}
+                {openTopics.length > 5 && (
+                  <li>
+                    <Link href={`${base}/themen`} className="text-slate-500 hover:underline">
+                      + {openTopics.length - 5} weitere
+                    </Link>
+                  </li>
+                )}
+              </ul>
+            )}
+          </div>
+          <div className="card p-4">
+            <h3 className="text-xs font-semibold tracking-wide text-slate-500 uppercase">Neueste Festlegungen</h3>
+            {latestDecisions.length === 0 ? (
+              <p className="mt-2 text-sm text-slate-500">Noch keine.</p>
+            ) : (
+              <ul className="mt-2 space-y-2 text-sm">
+                {latestDecisions.map((x) => (
+                  <li key={x.id}>
+                    <Link href={`${base}/themen?filter=festgelegt&offen=${x.id}#t-${x.id}`} className="font-medium hover:underline">
+                      {x.title}
+                    </Link>
+                    <div className="line-clamp-2 text-slate-600">{x.decision}</div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </section>
+      )}
 
       <section>
         <h2 className="mb-3 font-semibold text-slate-500">Schnellzugriff</h2>

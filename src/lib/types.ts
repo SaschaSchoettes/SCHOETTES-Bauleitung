@@ -31,15 +31,91 @@ export interface ScheduleItem {
   end_date: string;
   status: ScheduleStatus;
   note: string | null;
+  buffer_days: number;
+  sort_order: number;
   confirmed_at: string | null;
   confirmed_by: string | null;
   created_at: string;
 }
 
+export interface ScheduleComment {
+  id: string;
+  item_id: string;
+  project_id: string;
+  author_id: string;
+  body: string;
+  is_problem: boolean;
+  created_at: string;
+}
+
+export type TopicStatus = "offen" | "in_klaerung" | "festgelegt" | "erledigt";
+
+export const TOPIC_STATUS_LABELS: Record<TopicStatus, string> = {
+  offen: "Offen",
+  in_klaerung: "In Klärung",
+  festgelegt: "Festgelegt",
+  erledigt: "Erledigt",
+};
+
+export interface Topic {
+  id: string;
+  project_id: string;
+  title: string;
+  description: string | null;
+  trade: string | null;
+  responsible_id: string | null;
+  due_date: string | null;
+  status: TopicStatus;
+  decision: string | null;
+  decided_at: string | null;
+  decided_by: string | null;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TopicComment {
+  id: string;
+  topic_id: string;
+  project_id: string;
+  author_id: string;
+  body: string;
+  created_at: string;
+}
+
+export interface SiteVisit {
+  id: string;
+  project_id: string;
+  visit_date: string;
+  title: string | null;
+  body: string;
+  created_by: string | null;
+  created_at: string;
+}
+
+export type Visibility = "alle" | "bauherr" | "gewerk" | "intern";
+
+export const VISIBILITY_LABELS: Record<Visibility, string> = {
+  alle: "Alle Beteiligten",
+  bauherr: "Bauherr + intern",
+  gewerk: "Bauherr + intern + ein Gewerk",
+  intern: "Nur intern",
+};
+
+export const DOC_CATEGORIES = [
+  "Angebot",
+  "Auftrag",
+  "Nachtrag",
+  "Rechnung",
+  "Genehmigung",
+  "Gutachten / Nachweis",
+  "Sonstiges",
+];
+
 export interface ProjectFile {
   id: string;
   project_id: string;
-  kind: "plan" | "dokument";
+  kind: "plan" | "dokument" | "protokoll";
   title: string;
   category: string | null;
   plan_number: string | null;
@@ -49,7 +125,10 @@ export interface ProjectFile {
   file_name: string;
   mime_type: string | null;
   size_bytes: number | null;
-  visibility: "alle" | "intern";
+  visibility: Visibility;
+  visible_to: string | null;
+  trade: string | null;
+  doc_date: string | null;
   superseded: boolean;
   superseded_at: string | null;
   created_at: string;
@@ -95,6 +174,11 @@ export interface Project {
   end_date: string | null;
   status: ProjectStatus;
   notes: string | null;
+  billing_name: string | null;
+  billing_street: string | null;
+  billing_zip_city: string | null;
+  billing_email: string | null;
+  billing_note: string | null;
   created_at: string;
 }
 

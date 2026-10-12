@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireProject } from "@/lib/auth";
 import { updateProject } from "../actions";
 import { SubmitButton } from "@/components/SubmitButton";
@@ -51,7 +52,16 @@ export default async function StammdatenPage({
         {field("name", "Bezeichnung", p.name, { required: true })}
         {field("street", "Straße, Hausnummer", p.street)}
         {field("zip_city", "PLZ, Ort", p.zip_city)}
-        {field("client_name", "Auftraggeber", p.client_name, { wide: true })}
+        {field("client_name", "Auftraggeber / Bauherr", p.client_name, { wide: true })}
+
+        <h3 className="mt-2 font-semibold text-slate-600 sm:col-span-2">Rechnungsadresse</h3>
+        {field("billing_name", "Rechnungsempfänger", p.billing_name, { wide: true })}
+        {field("billing_street", "Straße, Hausnummer", p.billing_street)}
+        {field("billing_zip_city", "PLZ, Ort", p.billing_zip_city)}
+        {field("billing_email", "E-Mail für Rechnungen", p.billing_email, { type: "email" })}
+        {field("billing_note", "Hinweis (z. B. Projektnr. auf Rechnung angeben)", p.billing_note)}
+
+        <h3 className="mt-2 font-semibold text-slate-600 sm:col-span-2">Maßnahme &amp; Termine</h3>
 
         <div className="sm:col-span-2">
           <label className="label" htmlFor="measure">
@@ -97,6 +107,18 @@ export default async function StammdatenPage({
           </div>
         )}
       </form>
+
+      {canManage && (
+        <section className="card mt-6 flex flex-wrap items-center justify-between gap-3 p-5">
+          <div>
+            <h3 className="font-semibold">Zugänge &amp; Rollen</h3>
+            <p className="text-sm text-slate-500">Wer sich anmelden kann und was er sieht</p>
+          </div>
+          <Link href={`/projekte/${id}/zugaenge`} className="btn">
+            Zugänge verwalten →
+          </Link>
+        </section>
+      )}
     </div>
   );
 }

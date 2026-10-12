@@ -12,9 +12,15 @@ Smartphone zum Home-Bildschirm hinzufügen (kein App Store nötig).
 |---|---|---|
 | 1 | Konten GitHub / Supabase / Vercel | erledigt |
 | 2 | Login, Projekte, Rollen, Stammdaten, Kontakte, Zugänge | erledigt |
-| 3 | Rolle Baubegleitung, Bauzeitenplan (Bestätigung), Pläne & Dokumente (Index, „ungültig“, Sichtbarkeit), Kommunikation (Projektkanal, Einzelkanäle, Lesebestätigung) | **dieser Stand** – SQL `0002_…` ausführen |
-| 4 | Protokolle (Art noch festzulegen), Bautagebuch, Mängel | nach Bedarf |
-| 5 | Eigenes App-Symbol (Logo), eigene Domain | offen |
+| 3 | Rolle Baubegleitung, Bauzeitenplan (Bestätigung), Pläne, Kommunikation (Projektkanal, Einzelkanäle, Lesebestätigung) | erledigt – SQL `0002_…` |
+| 4 | Reiter: Übersicht · Themen · Kommunikation · Bauzeitenplan · Dokumente · Kontakte · Protokolle · Stammdaten. Themen (Festlegungen), Bauzeitenplan mit KW-Balkenplan, Puffer (intern), Notizen/Terminproblem, Excel-Import; Dokumente mit Sichtbarkeit alle/Bauherr/Gewerk/intern; Protokolle + Ortstermine mit Fotos; Rechnungsadresse | **dieser Stand** – SQL `0003_…` |
+| 5 | E-Mail-Benachrichtigung bei neuen Nachrichten / Terminproblemen | offen (Versanddienst einrichten) |
+| 6 | Eigenes App-Symbol (Logo), eigene Domain | offen |
+
+### Excel-Import Bauzeitenplan
+Erste Tabelle der Datei. Erkannt werden Spalten wie *Maßnahme/Vorgang*, *Start/Beginn*
+(Kalenderwoche oder Datum), *Dauer in Wochen/Tagen* oder *Ende*, optional *Gewerk*.
+Platzhalterzeilen („Aktivität 20“) werden übersprungen. Vorschau vor dem Übernehmen.
 
 ## Rollen
 
