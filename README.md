@@ -11,11 +11,10 @@ Smartphone zum Home-Bildschirm hinzufügen (kein App Store nötig).
 | Schritt | Inhalt | Status |
 |---|---|---|
 | 1 | Konten GitHub / Supabase / Vercel | erledigt |
-| 2 | Login, Projekte, Rollen, Stammdaten, Kontakte, Zugänge | **dieser Stand** |
-| 3 | Dokumentenablage, Planverwaltung (Index, Freigabe, „ungültig“) | offen |
-| 4 | Bauzeitenplan mit Bestätigung durch die Gewerke | offen |
-| 5 | Kommunikation: Projektkanal, Einzelkanäle, Lesebestätigung | offen |
-| 6 | Bautagebuch, Mängel, Aufgaben | nach Bedarf |
+| 2 | Login, Projekte, Rollen, Stammdaten, Kontakte, Zugänge | erledigt |
+| 3 | Rolle Baubegleitung, Bauzeitenplan (Bestätigung), Pläne & Dokumente (Index, „ungültig“, Sichtbarkeit), Kommunikation (Projektkanal, Einzelkanäle, Lesebestätigung) | **dieser Stand** – SQL `0002_…` ausführen |
+| 4 | Protokolle (Art noch festzulegen), Bautagebuch, Mängel | nach Bedarf |
+| 5 | Eigenes App-Symbol (Logo), eigene Domain | offen |
 
 ## Rollen
 

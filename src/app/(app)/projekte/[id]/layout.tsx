@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireProject } from "@/lib/auth";
+import { getUnread } from "@/lib/data";
 import { ProjectTabs, type Tab } from "@/components/ProjectTabs";
 
 export default async function ProjectLayout({
@@ -10,11 +11,15 @@ export default async function ProjectLayout({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { project, canManage } = await requireProject(id);
+  const { supabase, user, project, canManage } = await requireProject(id);
   const base = `/projekte/${id}`;
+  const { total: unread } = await getUnread(supabase, id, user.id);
 
   const tabs: Tab[] = [
     { href: base, label: "Übersicht" },
+    { href: `${base}/bauzeitenplan`, label: "Bauzeitenplan" },
+    { href: `${base}/plaene`, label: "Pläne" },
+    { href: `${base}/kommunikation`, label: unread > 0 ? `Kommunikation (${unread})` : "Kommunikation" },
     { href: `${base}/kontakte`, label: "Kontakte" },
     { href: `${base}/stammdaten`, label: "Stammdaten" },
   ];

@@ -60,9 +60,11 @@ export default async function ZugaengePage({
                 </div>
               </div>
 
-              {!isSelf && (
+              {(!isSelf || profile.is_admin) && (
                 <details className="mt-3 border-t border-slate-100 pt-2">
-                  <summary className="cursor-pointer text-sm text-slate-500">Bearbeiten</summary>
+                  <summary className="cursor-pointer text-sm text-slate-500">
+                    {isSelf ? "Eigene Rolle ändern" : "Bearbeiten"}
+                  </summary>
                   <form action={update} className="mt-3 grid gap-3 sm:grid-cols-3 sm:items-end">
                     <input type="hidden" name="user_id" value={m.user_id} />
                     <div>
@@ -83,7 +85,7 @@ export default async function ZugaengePage({
                       <SubmitButton>Speichern</SubmitButton>
                     </div>
                   </form>
-                  <div className="mt-3 flex flex-wrap items-start gap-3">
+                  {!isSelf && <div className="mt-3 flex flex-wrap items-start gap-3">
                     <form action={remove}>
                       <input type="hidden" name="user_id" value={m.user_id} />
                       <SubmitButton className="btn btn-sm btn-danger" pendingText="Entferne …">
@@ -98,7 +100,7 @@ export default async function ZugaengePage({
                         name={name}
                       />
                     )}
-                  </div>
+                  </div>}
                 </details>
               )}
             </article>
@@ -119,6 +121,7 @@ export default async function ZugaengePage({
         <h3 className="font-semibold text-slate-600">Rollen</h3>
         <ul className="mt-2 list-disc space-y-1 pl-5">
           <li><b>Bauleitung:</b> pflegt alle Inhalte und Zugänge des Projekts</li>
+          <li><b>Baubegleitung:</b> pflegt das Portal wie die Bauleitung (Termine, Pläne, Kommunikation) – ohne Bauleitungsfunktion</li>
           <li><b>Berater:</b> sieht alle Inhalte, ändert nichts</li>
           <li><b>Auftraggeber:</b> sieht die freigegebenen Inhalte</li>
           <li><b>Gewerk:</b> sieht die freigegebenen Inhalte</li>

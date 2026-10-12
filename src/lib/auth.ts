@@ -51,7 +51,8 @@ export async function requireProject(projectId: string) {
     .maybeSingle();
 
   const role = (membership?.role as Role | undefined) ?? null;
-  const canManage = profile.is_admin || role === "bauleitung";
+  const canManage = profile.is_admin || role === "bauleitung" || role === "baubegleitung";
+  const isInternal = canManage || role === "berater";
 
-  return { ...ctx, project: project as Project, role, canManage };
+  return { ...ctx, project: project as Project, role, canManage, isInternal };
 }
