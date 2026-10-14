@@ -152,6 +152,32 @@ export const DOC_CATEGORIES = [
   "Sonstiges",
 ];
 
+export const TRADE_FOLDERS = [
+  "Abbruch",
+  "Aufzug",
+  "Dach",
+  "Elektro",
+  "Estrich",
+  "Fassade / WDVS",
+  "Fenster / Türen",
+  "Gerüst",
+  "Heizung / Sanitär",
+  "Lüftung",
+  "Maler",
+  "Rohbau",
+  "Tiefbau",
+  "Trockenbau",
+  "Zimmerer",
+];
+
+export interface DocFolder {
+  id: string;
+  project_id: string;
+  parent_id: string | null;
+  name: string;
+  created_at: string;
+}
+
 export interface ProjectFile {
   id: string;
   project_id: string;
@@ -169,6 +195,7 @@ export interface ProjectFile {
   visible_to: string | null;
   trade: string | null;
   doc_date: string | null;
+  folder_id: string | null;
   superseded: boolean;
   superseded_at: string | null;
   created_at: string;

@@ -29,15 +29,21 @@ export function FileUpload({
   mode,
   planCategories = [],
   members = [],
+  folderId = null,
+  folderLabel = null,
+  initialKind = "plan",
 }: {
   projectId: string;
   mode: "dokumente" | "protokolle";
   planCategories?: string[];
   members?: MemberOption[];
+  folderId?: string | null;
+  folderLabel?: string | null;
+  initialKind?: "plan" | "dokument";
 }) {
   const router = useRouter();
-  const [kind, setKind] = useState<"plan" | "dokument">("plan");
-  const [visibility, setVisibility] = useState<Visibility>("alle");
+  const [kind, setKind] = useState<"plan" | "dokument">(initialKind);
+  const [visibility, setVisibility] = useState<Visibility>(initialKind === "plan" ? "alle" : "bauherr");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok?: string; error?: string }>({});
 
@@ -91,6 +97,7 @@ export function FileUpload({
         file_name: file.name,
         mime_type: file.type,
         size_bytes: file.size,
+        folder_id: folderId ?? "",
       });
       if (res.error) {
         setBusy(false);
@@ -102,7 +109,7 @@ export function FileUpload({
     setBusy(false);
     setMsg({ ok: done === 1 ? "Datei hochgeladen." : `${done} Dateien hochgeladen.` });
     form.reset();
-    chooseKind("plan");
+    chooseKind(initialKind);
     router.refresh();
   }
 
@@ -121,6 +128,12 @@ export function FileUpload({
             </button>
           ))}
         </div>
+      )}
+
+      {!isProtocol && kind === "dokument" && (
+        <p className="text-sm text-slate-600 sm:col-span-2">
+          Ablage in: <b>{folderLabel || "Dokumente (oberste Ebene)"}</b>
+        </p>
       )}
 
       <div className="sm:col-span-2">
