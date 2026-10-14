@@ -98,7 +98,8 @@ export default async function UebersichtPage({ params }: { params: Promise<{ id:
   });
 
   const tiles = [
-    { href: `${base}/projektstand`, title: "Projektstand", text: currentSteps.length ? currentSteps.map((s) => s.title).join(", ") : `${openTopics.length} offene Themen`, icon: "◎" },
+    { href: `${base}/projektstand`, title: "Projektstand", text: currentSteps.length ? currentSteps.map((s) => s.title).join(", ") : "Schritte", icon: "◎" },
+    { href: `${base}/themen`, title: "Festlegungen / Themen", text: `${openTopics.length} offen`, icon: "✓" },
     {
       href: `${base}/kommunikation`,
       title: "Kommunikation",
@@ -140,21 +141,9 @@ export default async function UebersichtPage({ params }: { params: Promise<{ id:
   return (
     <div className="space-y-6">
       {currentSteps.length > 0 && (
-        <Link href={`${base}/projektstand`} className="card block border-petrol p-4 transition hover:bg-brand-soft">
-          <div className="text-xs font-bold tracking-wide text-petrol uppercase">Projektstand – jetzt</div>
-          <ul className="mt-1 space-y-1">
-            {currentSteps.map((s) => {
-              const d = Math.max(0, Math.floor((Date.now() - new Date(s.status_since).getTime()) / 86_400_000));
-              return (
-                <li key={s.id}>
-                  <span className="font-semibold">{s.title}</span>
-                  <span className="text-sm text-slate-600">
-                    {s.ball_at ? ` · Ball: ${s.ball_at}` : ""} · {d === 0 ? "seit heute" : d === 1 ? "seit 1 Tag" : `seit ${d} Tagen`}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
+        <Link href={`${base}/projektstand`} className="card block p-4 hover:bg-slate-50">
+          <div className="text-xs font-semibold tracking-wide text-slate-500 uppercase">Projektstand – aktuell</div>
+          <div className="mt-1 font-semibold">{currentSteps.map((s) => s.title).join(" · ")}</div>
         </Link>
       )}
 
@@ -210,7 +199,7 @@ export default async function UebersichtPage({ params }: { params: Promise<{ id:
               <ul className="mt-2 space-y-1.5 text-sm">
                 {openTopics.slice(0, 5).map((x) => (
                   <li key={x.id}>
-                    <Link href={`${base}/projektstand?offen=t-${x.id}#t-${x.id}`} className="hover:underline">
+                    <Link href={`${base}/themen?offen=t-${x.id}#t-${x.id}`} className="hover:underline">
                       {x.title}
                     </Link>
                     {x.due_date && (
@@ -222,7 +211,7 @@ export default async function UebersichtPage({ params }: { params: Promise<{ id:
                 ))}
                 {openTopics.length > 5 && (
                   <li>
-                    <Link href={`${base}/projektstand`} className="text-slate-500 hover:underline">
+                    <Link href={`${base}/themen`} className="text-slate-500 hover:underline">
                       + {openTopics.length - 5} weitere
                     </Link>
                   </li>
@@ -238,7 +227,7 @@ export default async function UebersichtPage({ params }: { params: Promise<{ id:
               <ul className="mt-2 space-y-2 text-sm">
                 {latestDecisions.map((x) => (
                   <li key={x.id}>
-                    <Link href={`${base}/projektstand?offen=t-${x.id}#t-${x.id}`} className="font-medium hover:underline">
+                    <Link href={`${base}/themen?offen=t-${x.id}#t-${x.id}`} className="font-medium hover:underline">
                       {x.title}
                     </Link>
                     <div className="line-clamp-2 text-slate-600">{x.decision}</div>

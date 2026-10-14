@@ -108,19 +108,19 @@ export interface StepComment {
 }
 
 /** Typische Abfolge einer Sanierung – als Startpunkt für neue Projekte */
-export const STEP_TEMPLATE: { title: string; ball_at: string }[] = [
-  { title: "Bestandsaufnahme", ball_at: "Schöttes" },
-  { title: "Energieberatung / Sanierungskonzept", ball_at: "Energieberater" },
-  { title: "Festlegungen mit Bauherr (Umfang, Budget)", ball_at: "Bauherr" },
-  { title: "Statiker beauftragen", ball_at: "Bauherr" },
-  { title: "Statik / Positionsplanung", ball_at: "Statiker" },
-  { title: "Ausführungsplanung", ball_at: "Planer" },
-  { title: "Genehmigung / Förderantrag", ball_at: "Bauherr" },
-  { title: "Angebote einholen", ball_at: "Schöttes" },
-  { title: "Vergabe / Beauftragung Gewerke", ball_at: "Bauherr" },
-  { title: "Ausführung", ball_at: "Gewerke" },
-  { title: "Abnahme", ball_at: "Bauherr" },
-  { title: "Schlussrechnungen / Dokumentation", ball_at: "Gewerke" },
+export const STEP_TEMPLATE: { title: string }[] = [
+  { title: "Bestandsaufnahme" },
+  { title: "Energieberatung / Sanierungskonzept" },
+  { title: "Festlegungen mit Bauherr (Umfang, Budget)" },
+  { title: "Statiker beauftragen" },
+  { title: "Statik / Positionsplanung" },
+  { title: "Ausführungsplanung" },
+  { title: "Genehmigung / Förderantrag" },
+  { title: "Angebote einholen" },
+  { title: "Vergabe / Beauftragung Gewerke" },
+  { title: "Ausführung" },
+  { title: "Abnahme" },
+  { title: "Schlussrechnungen / Dokumentation" },
 ];
 
 export interface SiteVisit {
