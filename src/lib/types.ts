@@ -83,6 +83,46 @@ export interface TopicComment {
   created_at: string;
 }
 
+export type StepStatus = "offen" | "aktuell" | "erledigt";
+
+export interface ProjectStep {
+  id: string;
+  project_id: string;
+  position: number;
+  title: string;
+  ball_at: string | null;
+  note: string | null;
+  status: StepStatus;
+  status_since: string;
+  done_at: string | null;
+  created_at: string;
+}
+
+export interface StepComment {
+  id: string;
+  step_id: string;
+  project_id: string;
+  author_id: string;
+  body: string;
+  created_at: string;
+}
+
+/** Typische Abfolge einer Sanierung – als Startpunkt für neue Projekte */
+export const STEP_TEMPLATE: { title: string; ball_at: string }[] = [
+  { title: "Bestandsaufnahme", ball_at: "Schöttes" },
+  { title: "Energieberatung / Sanierungskonzept", ball_at: "Energieberater" },
+  { title: "Festlegungen mit Bauherr (Umfang, Budget)", ball_at: "Bauherr" },
+  { title: "Statiker beauftragen", ball_at: "Bauherr" },
+  { title: "Statik / Positionsplanung", ball_at: "Statiker" },
+  { title: "Ausführungsplanung", ball_at: "Planer" },
+  { title: "Genehmigung / Förderantrag", ball_at: "Bauherr" },
+  { title: "Angebote einholen", ball_at: "Schöttes" },
+  { title: "Vergabe / Beauftragung Gewerke", ball_at: "Bauherr" },
+  { title: "Ausführung", ball_at: "Gewerke" },
+  { title: "Abnahme", ball_at: "Bauherr" },
+  { title: "Schlussrechnungen / Dokumentation", ball_at: "Gewerke" },
+];
+
 export interface SiteVisit {
   id: string;
   project_id: string;
