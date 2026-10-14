@@ -23,7 +23,6 @@ export default async function ProjectLayout({
   ]);
 
   const tabs: Tab[] = [
-    { href: base, label: "Übersicht" },
     { href: `${base}/projektstand`, label: "Projektstand" },
     { href: `${base}/themen`, label: openTopics ? `Festlegungen / Themen (${openTopics})` : "Festlegungen / Themen" },
     { href: `${base}/kommunikation`, label: unread > 0 ? `Kommunikation (${unread})` : "Kommunikation" },

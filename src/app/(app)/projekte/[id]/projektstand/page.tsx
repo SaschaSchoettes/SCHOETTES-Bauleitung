@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireProject } from "@/lib/auth";
 import { deleteStep, insertTemplate, moveStep, saveStep, setStepStatus } from "./actions";
 import { SubmitButton } from "@/components/SubmitButton";
@@ -13,7 +14,7 @@ export default async function ProjektstandPage({
 }) {
   const { id } = await params;
   const sp = await searchParams;
-  const { supabase, canManage } = await requireProject(id);
+  const { supabase, user, canManage } = await requireProject(id);
 
   const { data } = await supabase
     .from("project_steps")
@@ -22,6 +23,15 @@ export default async function ProjektstandPage({
     .order("position")
     .order("created_at");
   const steps = (data ?? []) as ProjectStep[];
+
+  // Termine, die auf die Bestätigung des angemeldeten Beteiligten warten
+  const { count: toConfirm } = await supabase
+    .from("schedule_items")
+    .select("id", { count: "exact", head: true })
+    .eq("project_id", id)
+    .eq("assignee_id", user.id)
+    .is("confirmed_at", null)
+    .neq("status", "erledigt");
 
   const save = saveStep.bind(null, id);
   const setStatus = setStepStatus.bind(null, id);
@@ -38,8 +48,14 @@ export default async function ProjektstandPage({
         {steps.length ? `${doneCount} von ${steps.length} Schritten erledigt` : "Wo steht das Projekt"}
       </p>
 
-      <div className="mt-4">
+      <div className="mt-4 space-y-3">
         <Notice ok={sp.ok} error={sp.fehler} />
+        {!!toConfirm && (
+          <Link href={`/projekte/${id}/bauzeitenplan`} className="notice notice-info block">
+            <b>Bitte bestätigen:</b> {toConfirm === 1 ? "1 Termin wartet" : `${toConfirm} Termine warten`} im
+            Bauzeitenplan auf Ihre Bestätigung →
+          </Link>
+        )}
       </div>
 
       <section className="card mt-5 px-5 py-6">

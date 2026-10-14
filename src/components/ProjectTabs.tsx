@@ -22,8 +22,8 @@ export function ProjectTabs({ tabs }: { tabs: Tab[] }) {
     tabs.filter((t) => matches(t.href)).sort((a, b) => b.href.length - a.href.length)[0];
 
   return (
-    <nav className="no-scrollbar -mx-4 overflow-x-auto border-b border-slate-200 px-4">
-      <ul className="flex min-w-max gap-1">
+    <nav className="no-scrollbar -mx-4 overflow-x-auto border-b border-slate-200 px-4 sm:mx-0 sm:overflow-visible sm:px-0">
+      <ul className="flex min-w-max gap-x-1 sm:min-w-0 sm:flex-wrap">
         {tabs.map((t) => {
           const isActive = active?.href === t.href;
           return (
