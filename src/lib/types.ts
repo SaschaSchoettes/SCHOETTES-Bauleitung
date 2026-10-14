@@ -137,8 +137,8 @@ export type Visibility = "alle" | "bauherr" | "gewerk" | "intern";
 
 export const VISIBILITY_LABELS: Record<Visibility, string> = {
   alle: "Alle Beteiligten",
-  bauherr: "Bauherr + intern",
-  gewerk: "Bauherr + intern + ein Gewerk",
+  bauherr: "Auftraggeber + intern",
+  gewerk: "Auftraggeber + intern + ein Gewerk",
   intern: "Nur intern",
 };
 

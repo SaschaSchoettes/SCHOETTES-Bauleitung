@@ -123,7 +123,7 @@ export default async function DokumentePage({
     if (f.visibility === "alle") return null;
     const who =
       f.visibility === "gewerk" && f.visible_to && byId.get(f.visible_to)
-        ? `Bauherr + ${memberName(byId.get(f.visible_to)!)}`
+        ? `Auftraggeber + ${memberName(byId.get(f.visible_to)!)}`
         : VISIBILITY_LABELS[f.visibility];
     return <span className="badge badge-amber">🔒 {who}</span>;
   };
@@ -254,7 +254,7 @@ export default async function DokumentePage({
     <div>
       <h2 className="text-xl font-semibold">Dokumente</h2>
       <p className="mt-1 text-sm text-slate-500">
-        Pläne für alle Beteiligten · Angebote und Rechnungen nur für Bauherr und das betroffene Gewerk
+        Pläne für alle Beteiligten · Angebote und Rechnungen nur für Auftraggeber und das betroffene Gewerk
       </p>
 
       <div className="mt-4">
