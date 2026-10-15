@@ -46,7 +46,7 @@ export default async function DokumentePage({
 }) {
   const { id } = await params;
   const { ok, fehler, ordner } = await searchParams;
-  const { supabase, canManage, isInternal } = await requireProject(id);
+  const { supabase, user, canManage, isInternal, canUpload } = await requireProject(id);
 
   const [{ data }, members, { data: folderData }] = await Promise.all([
     supabase
@@ -150,6 +150,7 @@ export default async function DokumentePage({
             </div>
             <div className="truncate text-xs text-slate-400">
               {f.file_name} · hochgeladen {formatDate(f.created_at.slice(0, 10))}
+              {f.uploaded_by && byId.get(f.uploaded_by) ? ` von ${memberName(byId.get(f.uploaded_by)!)}` : ""}
             </div>
           </div>
           <div className="flex flex-col items-end gap-1.5">
@@ -186,7 +187,7 @@ export default async function DokumentePage({
           </details>
         )}
 
-        {canManage && (
+        {(canManage || (canUpload && f.uploaded_by === user.id)) && (
           <details className="mt-3 border-t border-slate-100 pt-2">
             <summary className="cursor-pointer text-sm text-slate-500">Verwalten</summary>
             <form action={vis} className="mt-3 grid gap-2 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
@@ -195,7 +196,7 @@ export default async function DokumentePage({
               <div>
                 <label className="label">Sichtbar für</label>
                 <select name="visibility" defaultValue={f.visibility} className="input">
-                  {(Object.keys(VISIBILITY_LABELS) as Visibility[]).map((v) => (
+                  {(Object.keys(VISIBILITY_LABELS) as Visibility[]).filter((v) => canManage || v !== "intern").map((v) => (
                     <option key={v} value={v}>
                       {VISIBILITY_LABELS[v]}
                     </option>
@@ -367,9 +368,9 @@ export default async function DokumentePage({
           </div>
         )}
 
-        {canManage && (
+        {canUpload && (
           <div className="mt-4 grid gap-4 lg:grid-cols-2">
-            <details className="card p-5" open={docs.length === 0 && folders.length > 0}>
+            <details className="card p-5" open={canManage && docs.length === 0 && folders.length > 0}>
               <summary className="cursor-pointer font-semibold">Dokument hier ablegen</summary>
               <FileUpload
                 key={current?.id ?? "root"}
@@ -379,9 +380,10 @@ export default async function DokumentePage({
                 members={memberOptions}
                 folderId={current?.id ?? null}
                 folderLabel={current ? folderLabel(current.id) : null}
+                allowIntern={canManage}
               />
             </details>
-            <details className="card p-5" open={folders.length === 0}>
+            {canManage && <details className="card p-5" open={folders.length === 0}>
               <summary className="cursor-pointer font-semibold">Ordner</summary>
               <form action={newFolder} className="mt-3 flex gap-2">
                 <input type="hidden" name="ordner" value={current?.id ?? ""} />
@@ -412,15 +414,15 @@ export default async function DokumentePage({
                   </form>
                 </div>
               )}
-            </details>
+            </details>}
           </div>
         )}
       </section>
 
-      {canManage && (
-        <details className="card mt-8 p-5" open={files.length === 0}>
+      {canUpload && (
+        <details className="card mt-8 p-5" open={canManage && files.length === 0}>
           <summary className="cursor-pointer font-semibold">Plan hochladen</summary>
-          <FileUpload projectId={id} mode="dokumente" planCategories={planCategories} members={memberOptions} />
+          <FileUpload projectId={id} mode="dokumente" planCategories={planCategories} members={memberOptions} allowIntern={canManage} />
         </details>
       )}
     </div>

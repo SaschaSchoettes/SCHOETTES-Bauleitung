@@ -32,6 +32,7 @@ export function FileUpload({
   folderId = null,
   folderLabel = null,
   initialKind = "plan",
+  allowIntern = true,
 }: {
   projectId: string;
   mode: "dokumente" | "protokolle";
@@ -40,6 +41,7 @@ export function FileUpload({
   folderId?: string | null;
   folderLabel?: string | null;
   initialKind?: "plan" | "dokument";
+  allowIntern?: boolean;
 }) {
   const router = useRouter();
   const [kind, setKind] = useState<"plan" | "dokument">(initialKind);
@@ -222,7 +224,7 @@ export function FileUpload({
               onChange={(e) => setVisibility(e.target.value as Visibility)}
               className="input"
             >
-              {(Object.keys(VISIBILITY_LABELS) as Visibility[]).map((v) => (
+              {(Object.keys(VISIBILITY_LABELS) as Visibility[]).filter((v) => allowIntern || v !== "intern").map((v) => (
                 <option key={v} value={v}>
                   {VISIBILITY_LABELS[v]}
                 </option>

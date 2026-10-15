@@ -53,6 +53,7 @@ export async function requireProject(projectId: string) {
   const role = (membership?.role as Role | undefined) ?? null;
   const canManage = profile.is_admin || role === "bauleitung" || role === "baubegleitung";
   const isInternal = canManage || role === "berater";
+  const canUpload = canManage || role === "auftraggeber";
 
-  return { ...ctx, project: project as Project, role, canManage, isInternal };
+  return { ...ctx, project: project as Project, role, canManage, isInternal, canUpload };
 }

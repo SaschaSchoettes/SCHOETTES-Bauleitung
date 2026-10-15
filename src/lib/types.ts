@@ -196,6 +196,7 @@ export interface ProjectFile {
   trade: string | null;
   doc_date: string | null;
   folder_id: string | null;
+  uploaded_by: string | null;
   superseded: boolean;
   superseded_at: string | null;
   created_at: string;

@@ -32,13 +32,17 @@ export type FileMeta = {
 
 /** Nach dem Upload in den Speicher: Datensatz anlegen. */
 export async function registerFile(projectId: string, meta: FileMeta): Promise<{ error?: string }> {
-  const { supabase, canManage } = await requireProject(projectId);
-  if (!canManage) return { error: "Keine Berechtigung." };
+  const { supabase, user, canManage, canUpload } = await requireProject(projectId);
+  if (!canUpload) return { error: "Keine Berechtigung." };
 
   if (!meta.storage_path.startsWith(projectId + "/")) return { error: "Ungültiger Speicherpfad." };
 
   const kind = meta.kind === "dokument" ? "dokument" : meta.kind === "protokoll" ? "protokoll" : "plan";
-  const visibility = (VISIBILITIES as string[]).includes(meta.visibility) ? (meta.visibility as Visibility) : "alle";
+  let visibility = (VISIBILITIES as string[]).includes(meta.visibility) ? (meta.visibility as Visibility) : "alle";
+  if (!canManage) {
+    if (kind === "protokoll") return { error: "Protokolle können nur von der Bauleitung abgelegt werden." };
+    if (visibility === "intern") visibility = "bauherr";
+  }
   const visibleTo = visibility === "gewerk" ? str(meta.visible_to) : null;
   if (visibility === "gewerk" && !visibleTo) {
     await supabase.storage.from(STORAGE_BUCKET).remove([meta.storage_path]);
@@ -55,6 +59,7 @@ export async function registerFile(projectId: string, meta: FileMeta): Promise<{
     project_id: projectId,
     kind,
     folder_id: folderId,
+    uploaded_by: user.id,
     title: str(meta.title) ?? meta.file_name,
     category: str(meta.category),
     trade: str(meta.trade),
@@ -87,18 +92,21 @@ function backTo(projectId: string, formData: FormData) {
 
 export async function deleteFile(projectId: string, formData: FormData) {
   const path = backTo(projectId, formData);
-  const { supabase, canManage } = await requireProject(projectId);
-  if (!canManage) redirect(`${path}fehler=${encodeURIComponent("Keine Berechtigung.")}`);
+  const { supabase, user, canManage, canUpload } = await requireProject(projectId);
+  if (!canUpload) redirect(`${path}fehler=${encodeURIComponent("Keine Berechtigung.")}`);
 
   const fileId = str(formData.get("file_id"));
   const { data: file } = await supabase
     .from("project_files")
-    .select("id, storage_path")
+    .select("id, storage_path, uploaded_by")
     .eq("id", fileId ?? "")
     .eq("project_id", projectId)
     .maybeSingle();
 
   if (!file) redirect(`${path}fehler=${encodeURIComponent("Datei nicht gefunden.")}`);
+  if (!canManage && file.uploaded_by !== user.id) {
+    redirect(`${path}fehler=${encodeURIComponent("Sie können nur eigene Uploads löschen.")}`);
+  }
 
   await supabase.storage.from(STORAGE_BUCKET).remove([file.storage_path]);
   const { error } = await supabase.from("project_files").delete().eq("id", file.id);
@@ -110,23 +118,26 @@ export async function deleteFile(projectId: string, formData: FormData) {
 
 export async function setVisibility(projectId: string, formData: FormData) {
   const path = backTo(projectId, formData);
-  const { supabase, canManage } = await requireProject(projectId);
-  if (!canManage) redirect(`${path}fehler=${encodeURIComponent("Keine Berechtigung.")}`);
+  const { supabase, canManage, canUpload } = await requireProject(projectId);
+  if (!canUpload) redirect(`${path}fehler=${encodeURIComponent("Keine Berechtigung.")}`);
 
   const fileId = str(formData.get("file_id"));
   const raw = String(formData.get("visibility") ?? "alle");
-  const visibility = (VISIBILITIES as string[]).includes(raw) ? raw : "alle";
+  let visibility = (VISIBILITIES as string[]).includes(raw) ? raw : "alle";
+  if (!canManage && visibility === "intern") visibility = "bauherr";
   const visibleTo = visibility === "gewerk" ? str(formData.get("visible_to")) : null;
   if (visibility === "gewerk" && !visibleTo) {
     redirect(`${path}fehler=${encodeURIComponent("Bitte das Gewerk auswählen.")}`);
   }
 
-  const { error } = await supabase
+  const { data: changed, error } = await supabase
     .from("project_files")
     .update({ visibility, visible_to: visibleTo })
     .eq("id", fileId ?? "")
-    .eq("project_id", projectId);
+    .eq("project_id", projectId)
+    .select("id");
   if (error) redirect(`${path}fehler=${encodeURIComponent("Ändern fehlgeschlagen: " + error.message)}`);
+  if (!changed?.length) redirect(`${path}fehler=${encodeURIComponent("Sie können nur eigene Uploads ändern.")}`);
 
   revalidatePath(path);
   redirect(`${path}ok=${encodeURIComponent("Sichtbarkeit geändert.")}`);
@@ -209,18 +220,20 @@ export async function insertTradeFolders(projectId: string) {
 
 export async function moveFile(projectId: string, formData: FormData) {
   const path = backTo(projectId, formData);
-  const { supabase, canManage } = await requireProject(projectId);
-  if (!canManage) redirect(`${path}fehler=${encodeURIComponent("Keine Berechtigung.")}`);
+  const { supabase, canUpload } = await requireProject(projectId);
+  if (!canUpload) redirect(`${path}fehler=${encodeURIComponent("Keine Berechtigung.")}`);
   const fileId = str(formData.get("file_id"));
   const target = str(formData.get("target"));
 
-  const { error } = await supabase
+  const { data: moved, error } = await supabase
     .from("project_files")
     .update({ folder_id: target })
     .eq("id", fileId ?? "")
     .eq("project_id", projectId)
-    .eq("kind", "dokument");
+    .eq("kind", "dokument")
+    .select("id");
   if (error) redirect(`${path}fehler=${encodeURIComponent(error.message)}`);
+  if (!moved?.length) redirect(`${path}fehler=${encodeURIComponent("Sie können nur eigene Uploads verschieben.")}`);
   revalidatePath(`/projekte/${projectId}/dokumente`);
   redirect(`${path}ok=${encodeURIComponent("Datei verschoben.")}`);
 }

@@ -26,6 +26,7 @@ Themen, Dokumente, Fotos …) – diese liegen in der Supabase-Datenbank.
    3. `supabase/migrations/0003_themen_dokumente_protokolle.sql`
    4. `supabase/migrations/0004_projektstand.sql`
    5. `supabase/migrations/0005_ordner.sql`
+   6. `supabase/migrations/0006_upload_auftraggeber.sql`
 
    Die Skripte sind wiederholbar – ein zweiter Lauf schadet nicht.
 3. **Eigenen Login anlegen:** Authentication → Users → *Add user* → E-Mail + Passwort,
@@ -65,7 +66,7 @@ Themen, Dokumente, Fotos …) – diese liegen in der Supabase-Datenbank.
 | Administrator | Projekte anlegen, alle Projekte, Passwörter zurücksetzen (nur per SQL vergeben) |
 | Bauleitung / Baubegleitung | alle Inhalte und Zugänge des Projekts pflegen |
 | Berater | alles sehen, nichts ändern |
-| Auftraggeber | Projektinhalte sehen inkl. Angebote/Rechnungen |
+| Auftraggeber | Projektinhalte sehen inkl. Angebote/Rechnungen; Pläne/Dokumente hochladen, eigene Uploads verwalten |
 | Gewerk | Projektinhalte sehen, nur eigene Angebote/Rechnungen; Notizen, Themen, Nachrichten an Bauleitung |
 
 ## Reiter
