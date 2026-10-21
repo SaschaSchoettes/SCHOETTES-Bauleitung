@@ -132,14 +132,15 @@ create trigger notify_file after insert on public.project_files
   for each row execute function public.trg_notify_file();
 
 -- ---------------------------------------------------------------------
--- Ortstermine
+-- Ortstermine → Bauleitung/Baubegleitung + Auftraggeber
 -- ---------------------------------------------------------------------
 create or replace function public.trg_notify_visit()
 returns trigger language plpgsql security definer set search_path = public as $$
 declare r record;
 begin
   for r in select user_id from public.project_members
-            where project_id = new.project_id and user_id is distinct from new.created_by loop
+            where project_id = new.project_id and user_id is distinct from new.created_by
+              and role::text in ('bauleitung', 'baubegleitung', 'auftraggeber') loop
     perform public.notify_add(r.user_id, new.project_id, 'protokoll',
       'Neuer Ortstermin vom ' || to_char(new.visit_date, 'DD.MM.YYYY') || coalesce(': ' || new.title, ''),
       '/projekte/' || new.project_id || '/protokolle');
@@ -153,11 +154,12 @@ create trigger notify_visit after insert on public.site_visits
   for each row execute function public.trg_notify_visit();
 
 -- ---------------------------------------------------------------------
--- Notizen im Bauzeitenplan → Bauleitung, Auftraggeber, zuständiges Gewerk
+-- Notizen im Bauzeitenplan → Bauleitung/Baubegleitung + Auftraggeber
 -- ---------------------------------------------------------------------
 drop trigger if exists notify_schedule_problem on public.schedule_comments;
 drop trigger if exists notify_schedule_confirm on public.schedule_items;
 drop function if exists public.trg_notify_schedule_problem();
+-- Gewerke erhalten nur Mails zu Dokumenten, die sie sehen dürfen, und zu Nachrichten an sie.
 drop function if exists public.trg_notify_schedule_confirm();
 
 create or replace function public.trg_notify_schedule_comment()
@@ -165,13 +167,12 @@ returns trigger language plpgsql security definer set search_path = public as $$
 declare
   r record;
   v_title text;
-  v_assignee uuid;
 begin
-  select title, assignee_id into v_title, v_assignee from public.schedule_items where id = new.item_id;
+  select title into v_title from public.schedule_items where id = new.item_id;
   for r in select user_id from public.project_members
             where project_id = new.project_id
               and user_id <> new.author_id
-              and (role::text in ('bauleitung', 'baubegleitung', 'auftraggeber') or user_id = v_assignee) loop
+              and role::text in ('bauleitung', 'baubegleitung', 'auftraggeber') loop
     perform public.notify_add(r.user_id, new.project_id, 'notiz',
       case when new.is_problem then '⚠ Terminproblem bei „' else 'Notiz zu „' end ||
       coalesce(v_title, 'Vorgang') || '“ (Bauzeitenplan) – ' || public.display_name(new.author_id) || ': ' || new.body,
@@ -186,14 +187,15 @@ create trigger notify_schedule_comment after insert on public.schedule_comments
   for each row execute function public.trg_notify_schedule_comment();
 
 -- ---------------------------------------------------------------------
--- Festlegungen / Themen: neues Thema und Antworten → alle Beteiligten
+-- Festlegungen / Themen: neues Thema und Antworten → Bauleitung/Baubegleitung + Auftraggeber
 -- ---------------------------------------------------------------------
 create or replace function public.trg_notify_topic()
 returns trigger language plpgsql security definer set search_path = public as $$
 declare r record;
 begin
   for r in select user_id from public.project_members
-            where project_id = new.project_id and user_id <> new.created_by loop
+            where project_id = new.project_id and user_id <> new.created_by
+              and role::text in ('bauleitung', 'baubegleitung', 'auftraggeber') loop
     perform public.notify_add(r.user_id, new.project_id, 'notiz',
       'Neues Thema von ' || public.display_name(new.created_by) || ': ' || new.title,
       '/projekte/' || new.project_id || '/themen?offen=t-' || new.id || '#t-' || new.id);
@@ -214,7 +216,8 @@ declare
 begin
   select title into v_title from public.topics where id = new.topic_id;
   for r in select user_id from public.project_members
-            where project_id = new.project_id and user_id <> new.author_id loop
+            where project_id = new.project_id and user_id <> new.author_id
+              and role::text in ('bauleitung', 'baubegleitung', 'auftraggeber') loop
     perform public.notify_add(r.user_id, new.project_id, 'notiz',
       'Antwort zu „' || coalesce(v_title, 'Thema') || '“ – ' || public.display_name(new.author_id) || ': ' || new.body,
       '/projekte/' || new.project_id || '/themen?offen=t-' || new.topic_id || '#t-' || new.topic_id);
@@ -228,7 +231,7 @@ create trigger notify_topic_comment after insert on public.topic_comments
   for each row execute function public.trg_notify_topic_comment();
 
 -- ---------------------------------------------------------------------
--- Notizen im Projektstand → alle Beteiligten
+-- Notizen im Projektstand → Bauleitung/Baubegleitung + Auftraggeber
 -- ---------------------------------------------------------------------
 create or replace function public.trg_notify_step_comment()
 returns trigger language plpgsql security definer set search_path = public as $$
@@ -238,7 +241,8 @@ declare
 begin
   select title into v_title from public.project_steps where id = new.step_id;
   for r in select user_id from public.project_members
-            where project_id = new.project_id and user_id <> new.author_id loop
+            where project_id = new.project_id and user_id <> new.author_id
+              and role::text in ('bauleitung', 'baubegleitung', 'auftraggeber') loop
     perform public.notify_add(r.user_id, new.project_id, 'notiz',
       'Notiz zu „' || coalesce(v_title, 'Schritt') || '“ (Projektstand) – ' ||
       public.display_name(new.author_id) || ': ' || new.body,
