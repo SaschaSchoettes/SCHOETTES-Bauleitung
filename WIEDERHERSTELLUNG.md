@@ -27,6 +27,7 @@ Themen, Dokumente, Fotos …) – diese liegen in der Supabase-Datenbank.
    4. `supabase/migrations/0004_projektstand.sql`
    5. `supabase/migrations/0005_ordner.sql`
    6. `supabase/migrations/0006_upload_auftraggeber.sql`
+   7. `supabase/migrations/0007_grants.sql` (Tabellenrechte – seit 30.10.2026 bei Supabase Pflicht)
 
    Die Skripte sind wiederholbar – ein zweiter Lauf schadet nicht.
 3. **Eigenen Login anlegen:** Authentication → Users → *Add user* → E-Mail + Passwort,
