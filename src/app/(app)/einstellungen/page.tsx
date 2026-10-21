@@ -10,7 +10,7 @@ const MODES = [
   {
     value: "sofort",
     title: "Sofort",
-    text: "E-Mail bei Neuigkeiten – mehrere Ereignisse werden gebündelt, höchstens eine Mail alle 15 Minuten.",
+    text: "E-Mail, sobald es Neues gibt. Kommt in kurzer Zeit mehreres zusammen, wird es in einer Mail gebündelt.",
   },
   { value: "taeglich", title: "Täglich", text: "Eine Zusammenfassung am Morgen (ab 7 Uhr), nur wenn es Neues gibt." },
   { value: "aus", title: "Aus", text: "Keine E-Mails. Neuigkeiten sehen Sie nur in der App." },
@@ -40,8 +40,8 @@ export default async function EinstellungenPage({
       <section className="card mt-5 p-5">
         <h2 className="font-semibold">E-Mail-Benachrichtigungen</h2>
         <p className="mt-1 text-sm text-slate-500">
-          An {profile.email || user.email}: neue Nachrichten, Dokumente und Pläne, Protokolle, Terminprobleme und
-          Termine zum Bestätigen.
+          An {profile.email || user.email} – nur wenn etwas Neues hinzukommt: hochgeladene Dokumente, Pläne und
+          Protokolle, Kommentare, Notizen und Nachrichten.
         </p>
         <form action={saveNotifyMode} className="mt-4 space-y-2">
           {MODES.map((m) => (

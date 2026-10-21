@@ -153,55 +153,101 @@ create trigger notify_visit after insert on public.site_visits
   for each row execute function public.trg_notify_visit();
 
 -- ---------------------------------------------------------------------
--- Terminproblem (Notiz im Bauzeitenplan) → Bauleitung + Auftraggeber
+-- Notizen im Bauzeitenplan → Bauleitung, Auftraggeber, zuständiges Gewerk
 -- ---------------------------------------------------------------------
-create or replace function public.trg_notify_schedule_problem()
+drop trigger if exists notify_schedule_problem on public.schedule_comments;
+drop trigger if exists notify_schedule_confirm on public.schedule_items;
+drop function if exists public.trg_notify_schedule_problem();
+drop function if exists public.trg_notify_schedule_confirm();
+
+create or replace function public.trg_notify_schedule_comment()
 returns trigger language plpgsql security definer set search_path = public as $$
 declare
   r record;
   v_title text;
+  v_assignee uuid;
 begin
-  if not new.is_problem then
-    return new;
-  end if;
-  select title into v_title from public.schedule_items where id = new.item_id;
+  select title, assignee_id into v_title, v_assignee from public.schedule_items where id = new.item_id;
   for r in select user_id from public.project_members
             where project_id = new.project_id
-              and role::text in ('bauleitung', 'baubegleitung', 'auftraggeber')
-              and user_id <> new.author_id loop
-    perform public.notify_add(r.user_id, new.project_id, 'termin',
-      '⚠ Terminproblem bei „' || coalesce(v_title, 'Vorgang') || '“ – ' ||
-      public.display_name(new.author_id) || ': ' || new.body,
+              and user_id <> new.author_id
+              and (role::text in ('bauleitung', 'baubegleitung', 'auftraggeber') or user_id = v_assignee) loop
+    perform public.notify_add(r.user_id, new.project_id, 'notiz',
+      case when new.is_problem then '⚠ Terminproblem bei „' else 'Notiz zu „' end ||
+      coalesce(v_title, 'Vorgang') || '“ (Bauzeitenplan) – ' || public.display_name(new.author_id) || ': ' || new.body,
       '/projekte/' || new.project_id || '/bauzeitenplan?offen=' || new.item_id || '#v-' || new.item_id);
   end loop;
   return new;
 end;
 $$;
 
-drop trigger if exists notify_schedule_problem on public.schedule_comments;
-create trigger notify_schedule_problem after insert on public.schedule_comments
-  for each row execute function public.trg_notify_schedule_problem();
+drop trigger if exists notify_schedule_comment on public.schedule_comments;
+create trigger notify_schedule_comment after insert on public.schedule_comments
+  for each row execute function public.trg_notify_schedule_comment();
 
 -- ---------------------------------------------------------------------
--- Termin zum Bestätigen → zuständiger Beteiligter
+-- Festlegungen / Themen: neues Thema und Antworten → alle Beteiligten
 -- ---------------------------------------------------------------------
-create or replace function public.trg_notify_schedule_confirm()
+create or replace function public.trg_notify_topic()
 returns trigger language plpgsql security definer set search_path = public as $$
+declare r record;
 begin
-  if new.assignee_id is not null and new.confirmed_at is null and new.status <> 'erledigt'
-     and (tg_op = 'INSERT'
-          or old.assignee_id is distinct from new.assignee_id
-          or old.start_date <> new.start_date
-          or old.end_date <> new.end_date) then
-    perform public.notify_add(new.assignee_id, new.project_id, 'termin',
-      'Bitte Termin bestätigen: ' || new.title || ' (' ||
-      to_char(new.start_date, 'DD.MM.') || '–' || to_char(new.end_date, 'DD.MM.YYYY') || ')',
-      '/projekte/' || new.project_id || '/bauzeitenplan?offen=' || new.id || '#v-' || new.id);
-  end if;
+  for r in select user_id from public.project_members
+            where project_id = new.project_id and user_id <> new.created_by loop
+    perform public.notify_add(r.user_id, new.project_id, 'notiz',
+      'Neues Thema von ' || public.display_name(new.created_by) || ': ' || new.title,
+      '/projekte/' || new.project_id || '/themen?offen=t-' || new.id || '#t-' || new.id);
+  end loop;
   return new;
 end;
 $$;
 
-drop trigger if exists notify_schedule_confirm on public.schedule_items;
-create trigger notify_schedule_confirm after insert or update on public.schedule_items
-  for each row execute function public.trg_notify_schedule_confirm();
+drop trigger if exists notify_topic on public.topics;
+create trigger notify_topic after insert on public.topics
+  for each row execute function public.trg_notify_topic();
+
+create or replace function public.trg_notify_topic_comment()
+returns trigger language plpgsql security definer set search_path = public as $$
+declare
+  r record;
+  v_title text;
+begin
+  select title into v_title from public.topics where id = new.topic_id;
+  for r in select user_id from public.project_members
+            where project_id = new.project_id and user_id <> new.author_id loop
+    perform public.notify_add(r.user_id, new.project_id, 'notiz',
+      'Antwort zu „' || coalesce(v_title, 'Thema') || '“ – ' || public.display_name(new.author_id) || ': ' || new.body,
+      '/projekte/' || new.project_id || '/themen?offen=t-' || new.topic_id || '#t-' || new.topic_id);
+  end loop;
+  return new;
+end;
+$$;
+
+drop trigger if exists notify_topic_comment on public.topic_comments;
+create trigger notify_topic_comment after insert on public.topic_comments
+  for each row execute function public.trg_notify_topic_comment();
+
+-- ---------------------------------------------------------------------
+-- Notizen im Projektstand → alle Beteiligten
+-- ---------------------------------------------------------------------
+create or replace function public.trg_notify_step_comment()
+returns trigger language plpgsql security definer set search_path = public as $$
+declare
+  r record;
+  v_title text;
+begin
+  select title into v_title from public.project_steps where id = new.step_id;
+  for r in select user_id from public.project_members
+            where project_id = new.project_id and user_id <> new.author_id loop
+    perform public.notify_add(r.user_id, new.project_id, 'notiz',
+      'Notiz zu „' || coalesce(v_title, 'Schritt') || '“ (Projektstand) – ' ||
+      public.display_name(new.author_id) || ': ' || new.body,
+      '/projekte/' || new.project_id || '/projektstand');
+  end loop;
+  return new;
+end;
+$$;
+
+drop trigger if exists notify_step_comment on public.step_comments;
+create trigger notify_step_comment after insert on public.step_comments
+  for each row execute function public.trg_notify_step_comment();
