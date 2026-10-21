@@ -4,7 +4,7 @@ import type { User } from "@supabase/supabase-js";
 
 type CookieToSet = { name: string; value: string; options: CookieOptions };
 
-const PUBLIC_PATHS = ["/login"];
+const PUBLIC_PATHS = ["/login", "/api/notify"];
 
 function configError(message: string) {
   return new NextResponse(

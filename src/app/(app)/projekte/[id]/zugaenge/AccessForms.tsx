@@ -15,7 +15,7 @@ function Credentials({ c }: { c: NonNullable<AccessState["credentials"]> }) {
     `Adresse: ${url}\n` +
     `E-Mail: ${c.email}\n` +
     `Passwort: ${c.password}\n\n` +
-    `Bitte ändern Sie das Passwort nach der ersten Anmeldung (oben rechts „Passwort“).`;
+    `Bitte ändern Sie das Passwort nach der ersten Anmeldung (oben rechts „Einstellungen“).`;
 
   return (
     <div className="notice notice-info space-y-2">

@@ -16,7 +16,7 @@ Smartphone zum Home-Bildschirm hinzufügen (kein App Store nötig).
 | 4 | Reiter: Übersicht · Themen · Kommunikation · Bauzeitenplan · Dokumente · Kontakte · Protokolle · Stammdaten. Themen (Festlegungen), Bauzeitenplan mit KW-Balkenplan, Puffer (intern), Notizen/Terminproblem, Excel-Import; Dokumente mit Sichtbarkeit alle/Bauherr/Gewerk/intern; Protokolle + Ortstermine mit Fotos; Rechnungsadresse | **dieser Stand** – SQL `0003_…` |
 | 4b | Reiter „Projektstand“ (ersetzt „Themen“): Schrittkette mit „Ball liegt bei“, Alters-Ampel, Notizen, Vorlage Sanierung; Themen & Festlegungen als einfaches Textfeld mit Antworten | **dieser Stand** – SQL `0004_…` |
 | 4c | Ordner für Dokumente (0005), Auftraggeber darf Pläne/Dokumente hochladen und eigene Uploads verwalten (0006) | erledigt – SQL `0005_…`, `0006_…` |
-| 5 | E-Mail-Benachrichtigung bei neuen Nachrichten / Terminproblemen | offen (Versanddienst einrichten) |
+| 5 | E-Mail-Benachrichtigung (sofort gebündelt / täglich / aus) über Resend + Supabase-Zeitplan | SQL `0008_…` + `benachrichtigung_zeitplan.sql` |
 | 6 | Eigenes App-Symbol (Logo), eigene Domain | offen |
 
 ### Excel-Import Bauzeitenplan

@@ -28,6 +28,7 @@ Themen, Dokumente, Fotos …) – diese liegen in der Supabase-Datenbank.
    5. `supabase/migrations/0005_ordner.sql`
    6. `supabase/migrations/0006_upload_auftraggeber.sql`
    7. `supabase/migrations/0007_grants.sql` (Tabellenrechte – seit 30.10.2026 bei Supabase Pflicht)
+   8. `supabase/migrations/0008_benachrichtigungen.sql`
 
    Die Skripte sind wiederholbar – ein zweiter Lauf schadet nicht.
 3. **Eigenen Login anlegen:** Authentication → Users → *Add user* → E-Mail + Passwort,
@@ -45,7 +46,12 @@ Themen, Dokumente, Fotos …) – diese liegen in der Supabase-Datenbank.
    | `SUPABASE_SERVICE_ROLE_KEY` | Secret key (`sb_secret_…`) – **geheim** | Geheimnis |
 
    → *Deploy*. Bei Änderungen an Variablen: Deployments → … → *Redeploy*.
-7. **Domain:** Vercel → Domains → `portal.schoettes.com` hinzufügen →
+7. **E-Mail-Benachrichtigung:** Konto bei resend.com, Domain `schoettes.com` (Region EU) mit den
+   angezeigten DNS-Einträgen bei IONOS verifizieren, API-Key erzeugen. In Vercel zusätzlich:
+   `RESEND_API_KEY` (Geheimnis), `CRON_SECRET` (Geheimnis, beliebiges langes Zufallswort),
+   `APP_URL=https://portal.schoettes.com`. Dann `supabase/benachrichtigung_zeitplan.sql` mit
+   demselben Geheimwort ausführen. Test: Einstellungen → „Testmail an mich senden“.
+8. **Domain:** Vercel → Domains → `portal.schoettes.com` hinzufügen →
    angezeigten CNAME-Eintrag bei IONOS (DNS von schoettes.com) anlegen, Hostname `portal`.
 
 ## Wichtige Hinweise

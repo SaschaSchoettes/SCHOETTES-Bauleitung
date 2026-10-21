@@ -15,8 +15,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </Link>
           <nav className="flex items-center gap-4 text-sm text-slate-500">
             <span className="hidden sm:inline">{profile.full_name || profile.email}</span>
-            <Link href="/passwort" className="hover:text-slate-900">
-              Passwort
+            <Link href="/einstellungen" className="hover:text-slate-900">
+              Einstellungen
             </Link>
             <form action={signOut}>
               <button type="submit" className="hover:text-slate-900">
