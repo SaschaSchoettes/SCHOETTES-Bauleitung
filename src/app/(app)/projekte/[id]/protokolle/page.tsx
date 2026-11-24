@@ -1,4 +1,5 @@
 import { requireProject } from "@/lib/auth";
+import { RaumPfad } from "@/components/RaumPfad";
 import { getMembers, memberName } from "@/lib/data";
 import { deleteSiteVisit } from "./actions";
 import { deleteFile } from "../dokumente/actions";
@@ -60,6 +61,7 @@ export default async function ProtokollePage({
 
   return (
     <div>
+      <RaumPfad projectId={id} items={[{ label: "Protokolle" }]} />
       <h2 className="text-xl font-semibold">Protokolle</h2>
       <p className="mt-1 text-sm text-slate-500">
         Besprechungsprotokolle und Ortstermine – sichtbar für alle Beteiligten und den Bauherrn

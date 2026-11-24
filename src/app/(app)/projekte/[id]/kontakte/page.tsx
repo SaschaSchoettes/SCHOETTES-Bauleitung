@@ -1,4 +1,5 @@
 import { requireProject } from "@/lib/auth";
+import { RaumPfad } from "@/components/RaumPfad";
 import { deleteContact, saveContact } from "../actions";
 import { SubmitButton } from "@/components/SubmitButton";
 import { Notice } from "@/components/Notice";
@@ -81,6 +82,7 @@ export default async function KontaktePage({
 
   return (
     <div>
+      <RaumPfad projectId={id} items={[{ label: "Kontakte" }]} />
       <h2 className="text-xl font-semibold">Kontakte</h2>
       <p className="mt-1 text-sm text-slate-500">Alle Beteiligten mit Ansprechpartner und Erreichbarkeit</p>
 

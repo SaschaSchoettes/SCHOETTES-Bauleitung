@@ -175,8 +175,18 @@ export interface DocFolder {
   project_id: string;
   parent_id: string | null;
   name: string;
+  share_all: boolean;
   created_at: string;
 }
+
+export interface FolderShare {
+  folder_id: string;
+  user_id: string;
+  can_upload: boolean;
+}
+
+/** Rollen, die im Projektraum immer alles sehen */
+export const INTERNAL_ROLES: Role[] = ["bauleitung", "baubegleitung", "berater"];
 
 export interface ProjectFile {
   id: string;

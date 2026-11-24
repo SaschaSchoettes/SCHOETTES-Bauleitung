@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { RaumPfad } from "@/components/RaumPfad";
 import { requireProject } from "@/lib/auth";
 import { updateProject } from "../actions";
 import { SubmitButton } from "@/components/SubmitButton";
@@ -42,7 +43,8 @@ export default async function StammdatenPage({
 
   return (
     <div>
-      <h2 className="text-xl font-semibold">Stammdaten</h2>
+      <RaumPfad projectId={id} items={[{ label: "Projektdaten" }]} />
+      <h2 className="text-xl font-semibold">Projektdaten</h2>
       <p className="mt-1 text-sm text-slate-500">
         Projektdaten{ro ? " – nur Ansicht, Änderungen über die Bauleitung" : ""}
       </p>

@@ -17,7 +17,7 @@ Smartphone zum Home-Bildschirm hinzufügen (kein App Store nötig).
 | 4b | Reiter „Projektstand“ (ersetzt „Themen“): Schrittkette mit „Ball liegt bei“, Alters-Ampel, Notizen, Vorlage Sanierung; Themen & Festlegungen als einfaches Textfeld mit Antworten | **dieser Stand** – SQL `0004_…` |
 | 4c | Ordner für Dokumente (0005), Auftraggeber darf Pläne/Dokumente hochladen und eigene Uploads verwalten (0006) | erledigt – SQL `0005_…`, `0006_…` |
 | 5 | E-Mail-Benachrichtigung (sofort gebündelt / täglich / aus) über Resend + Supabase-Zeitplan | SQL `0008_…` + `benachrichtigung_zeitplan.sql` |
-| 6 | Eigenes App-Symbol (Logo), eigene Domain | offen |
+| 6 | Projektraum wie OneDrive: Stammordner, Ordnerfreigaben je Beteiligtem (lesen/hochladen), 4 Reiter | SQL `0009_…` |
 
 ### Excel-Import Bauzeitenplan
 Erste Tabelle der Datei. Erkannt werden Spalten wie *Maßnahme/Vorgang*, *Start/Beginn*

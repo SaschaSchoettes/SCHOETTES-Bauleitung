@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { RaumPfad } from "@/components/RaumPfad";
 import { requireProject } from "@/lib/auth";
 import { getMembers, memberLabel, memberName } from "@/lib/data";
 import { isoWeekOf } from "@/lib/scheduleImport";
@@ -169,6 +170,7 @@ export default async function BauzeitenplanPage({
 
   return (
     <div>
+      <RaumPfad projectId={id} items={[{ label: "Bauzeitenplan" }]} />
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold">Bauzeitenplan</h2>

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { RaumPfad } from "@/components/RaumPfad";
 import { requireProject } from "@/lib/auth";
 import { removeMember, updateMember } from "../actions";
 import { SubmitButton } from "@/components/SubmitButton";
@@ -30,6 +31,7 @@ export default async function ZugaengePage({
 
   return (
     <div>
+      <RaumPfad projectId={id} items={[{ label: "Projektdaten", href: `/projekte/${id}/stammdaten` }, { label: "Zugänge" }]} />
       <h2 className="text-xl font-semibold">Zugänge</h2>
       <p className="mt-1 text-sm text-slate-500">
         Wer sich anmelden kann und welche Rolle er im Projekt hat

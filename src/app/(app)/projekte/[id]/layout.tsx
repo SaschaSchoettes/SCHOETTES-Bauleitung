@@ -26,11 +26,18 @@ export default async function ProjectLayout({
     { href: `${base}/projektstand`, label: "Projektstand" },
     { href: `${base}/themen`, label: openTopics ? `Festlegungen / Themen (${openTopics})` : "Festlegungen / Themen" },
     { href: `${base}/kommunikation`, label: unread > 0 ? `Kommunikation (${unread})` : "Kommunikation" },
-    { href: `${base}/bauzeitenplan`, label: "Bauzeitenplan" },
-    { href: `${base}/dokumente`, label: "Dokumente" },
-    { href: `${base}/kontakte`, label: "Kontakte" },
-    { href: `${base}/protokolle`, label: "Protokolle" },
-    { href: `${base}/stammdaten`, label: "Stammdaten", also: [`${base}/zugaenge`] },
+    {
+      href: `${base}/dokumente`,
+      label: "Projektraum",
+      also: [
+        `${base}/bauzeitenplan`,
+        `${base}/protokolle`,
+        `${base}/kontakte`,
+        `${base}/stammdaten`,
+        `${base}/zugaenge`,
+        `${base}/plaene`,
+      ],
+    },
   ];
 
   return (

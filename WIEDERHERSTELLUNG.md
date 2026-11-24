@@ -29,6 +29,7 @@ Themen, Dokumente, Fotos …) – diese liegen in der Supabase-Datenbank.
    6. `supabase/migrations/0006_upload_auftraggeber.sql`
    7. `supabase/migrations/0007_grants.sql` (Tabellenrechte – seit 30.10.2026 bei Supabase Pflicht)
    8. `supabase/migrations/0008_benachrichtigungen.sql`
+   9. `supabase/migrations/0009_projektraum.sql` (Ordnerfreigaben)
 
    Die Skripte sind wiederholbar – ein zweiter Lauf schadet nicht.
 3. **Eigenen Login anlegen:** Authentication → Users → *Add user* → E-Mail + Passwort,
@@ -73,10 +74,15 @@ Themen, Dokumente, Fotos …) – diese liegen in der Supabase-Datenbank.
 | Administrator | Projekte anlegen, alle Projekte, Passwörter zurücksetzen (nur per SQL vergeben) |
 | Bauleitung / Baubegleitung | alle Inhalte und Zugänge des Projekts pflegen |
 | Berater | alles sehen, nichts ändern |
-| Auftraggeber | Projektinhalte sehen inkl. Angebote/Rechnungen; Pläne/Dokumente hochladen, eigene Uploads verwalten |
-| Gewerk | Projektinhalte sehen, nur eigene Angebote/Rechnungen; Notizen, Themen, Nachrichten an Bauleitung |
+| Auftraggeber | Projektraum: freigegebene Ordner (lesen/hochladen je Freigabe), oberste Ebene hochladen; eigene Uploads verwalten |
+| Gewerk | Projektraum: freigegebene Ordner (lesen/hochladen je Freigabe); Notizen, Themen, Nachrichten an Bauleitung |
+
+Freigaben hängen am Ordner und gelten für alle Unterordner. Bauleitung, Baubegleitung und
+Berater sehen immer alles. Ausnahme je Datei: „nur intern“.
 
 ## Reiter
 
-Projektstand · Festlegungen / Themen · Kommunikation · Bauzeitenplan · Dokumente ·
-Kontakte · Protokolle · Stammdaten (mit Zugängen)
+Projektstand · Festlegungen / Themen · Kommunikation · Projektraum
+
+Projektraum (Stammordner): Bauzeitenplan · Protokolle & Ortstermine · Kontakte ·
+Projektdaten (mit Zugängen) · eigene Ordner mit Dateien
